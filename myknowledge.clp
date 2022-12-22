@@ -44,7 +44,7 @@
 
 (msg21 "Czy masz w sobie cos z potwora?@2@Tak@Nie@potwor")
 
-(msg22 "Ktora z ponizszych propozycji najbardziej ci odpowiada?@3@Jestem gibki, zwinny i mroczny@Jestem silny, niski oraz niemily@Kiedys bylem swiety ale wypadlem z laski@cechy")
+(msg22 "Ktora z ponizszych propozycja najbardziej ci odpowiada?@3@Jestem gibki, zwinny i mroczny@Jestem silny, niski oraz niemily@Kiedys bylem swiety ale wypadlem z laski@cechy")
 
 (msg23 "Dlaczego jestes dla innych niezrozumialy?@4@Jestem mroczna wersja jakiejs klasycznej rasy@Jedno z moich rodzicow pochodzi z gatunku, ktory jest uwazany za brutalny i okrutny@Mam zlowrogie rogi i wygladam jak diabel@Jestem gadem bez emocji@cechy")
 
@@ -139,6 +139,7 @@
 )
 
 (defrule preferowane_rasy2
+	(powod_gry Chce przezyc przygode)
 	(wyroznia Nie wiem)
 	?i2 <- (msg2 ?x)
 	=>
@@ -147,10 +148,7 @@
 )	
 
 (defrule wyroznia1
-	(or
-		(powod_gry Chce przezyc przygode)
-		(czlowiek Tak)
-	)
+	(powod_gry Chce przezyc przygode)
 	?i2 <- (msg3 ?x)
 	=>
 	(send-to-java ?x)
@@ -362,13 +360,7 @@
 )
 
 (defrule inteligencja2
-	(or
-		(cechy Bezposrednia konfrontacja)
-		(and 
-			(rozmiar Duzy)
-			(potwor W calosci)
-		)
-	)	
+	(cechy Bezposrednia konfrontacja)
 	?i2 <- (msg32 ?x)
 	=>
 	(send-to-java ?x)
@@ -576,10 +568,7 @@
 )
 
 (defrule more_dark
-	(or
-		(cechy Chcialbym byc mroczny i ponury)
-		(cechy Jestem gibki, zwinny i mroczny)
-	)
+	(cechy Chcialbym byc mroczny i ponury)
 	?i2 <- (msg46 ?x)
 	=>
 	(send-to-java ?x)
@@ -636,9 +625,12 @@
 
 ;-------CZŁOWIEK-------
 (defrule human
-	(and
-		(wyroznia Charakter)
-		(human_result Swietnie)
+	(or
+		(czlowiek Tak)
+		(and
+			(wyroznia Charakter)
+			(human_result Swietnie)
+		)
 	)
 	=>
 	(assert (answer "HUMAN@0@null@odpowiedz"))
@@ -653,7 +645,7 @@
 		(inteligencja Glupia)
 	)
 	=>
-	(assert (answer "HALFLING@0@null@odpowiedz"))
+	(assert (answer "HAFLING@0@null@odpowiedz"))
 )
 
 (defrule stout
@@ -785,11 +777,14 @@
 )
 
 (defrule drow
-	(and
-		(drow_result Swietnie)
-		(elf_podrasa Tak)
-		(wazne Cos innego)
-		(cechy Chcialbym byc mroczny i ponury)
+	(or
+		(and
+			(drow_result Swietnie)
+			(elf_podrasa Tak)
+			(wazne Cos innego)
+			(cechy Chcialbym byc mroczny i ponury)
+		)
+		(cechy Jestem gibki, zwinny i mroczny)
 	)
 	=>
 	(assert (answer "DROW@0@null@odpowiedz"))
@@ -798,7 +793,7 @@
 (defrule shadar-kai
 	(drow_result Chce byc jeszcze bardziej mroczny)
 	=>
-	(assert (answer "SHADAR-KAI@0@null@odpowiedz"))
+	(assert (answer "SHADAR KAI@0@null@odpowiedz"))
 )
 
 
@@ -866,7 +861,16 @@
 
 ;-------ORKI-------
 (defrule orc
-		(orc_choice Ok)
+	(or
+		(and
+			(cechy Bezposrednia konfrontacja)
+			(orc_choice Ok)
+		)
+		(and
+			(wyglad Potwor)
+			(rozmiar Duzy)
+		)
+	)
 	=>
 	(assert (answer "ORC@0@null@odpowiedz"))
 	
@@ -877,7 +881,6 @@
 		(orc_choice Czy moge byc bardziej bohaterski?)
 		(cechy Jedno z moich rodzicow pochodzi z gatunku, ktory jest uwazany za brutalny i okrutny)
 		(polowa Potworny)
-		(potwor Czesciowo)
 	)
 	=>
 	(assert (answer "HALF-ORC@0@null@odpowiedz"))
